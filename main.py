@@ -63,25 +63,30 @@ app.layout = dbc.Container([
                    marks={i: str(i) for i in range(10, 201, 10)}, tooltip={"placement": "bottom", "always_visible": True}),
     ], className="my-3"),
 
+    dbc.Row([
+        dbc.Label("Smooth Window Length:"),
+        dcc.Slider(id='smooth-slider', min=3, max=51, step=2, value=11,
+                   marks={i: str(i) for i in range(3, 52, 2)}, tooltip={"placement": "bottom", "always_visible": True}),
+    ], className="my-3"),
+
     dcc.Store(id='current-index', data=0),
 ], fluid=True)
 
 @app.callback(
     Output("candlestick-chart", "figure"),
     Input("current-index", "data"),
-    Input("candle-slider", "value")
+    Input("candle-slider", "value"),
+    Input("smooth-slider", "value")
 )
-def update_chart(index, window_size):
+def update_chart(index, window_size, smooth_window):
     start = max(0, index)
     end = min(len(df), start + window_size)
     dff = df.iloc[start:end].reset_index(drop=True)
 
-    # Smoothen the closing price graph
-    month_diff = max(dff.shape[0] // 30, 1)
-    smooth = int(2 * month_diff + 3)
-    dff['Smoothed_Close'] = savgol_filter(dff['Close'], smooth, 3)
+    if smooth_window >= len(dff):
+        smooth_window = len(dff) - 1 if len(dff) % 2 == 0 else len(dff)
 
-    dates_str = [str(date) for date in dff['Date']]
+    dff['Smoothed_Close'] = savgol_filter(dff['Close'], smooth_window, 3)
 
     fig = go.Figure()
     fig.add_trace(go.Candlestick(
@@ -95,7 +100,6 @@ def update_chart(index, window_size):
 
     fig.add_trace(go.Scatter(x=dff.index, y=dff['Smoothed_Close'], mode='lines', name='Smoothed Close', line=dict(color='cyan')))
 
-    # Plot support and resistance levels safely
     levels = zigzag_cluster_levels(dff)
     if levels.size > 0:
         for level in levels:
