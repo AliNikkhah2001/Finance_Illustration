@@ -8,7 +8,7 @@ from ta.trend import MACD
 from ta.volatility import BollingerBands
 
 # Load Data
-df = pd.read_csv('/mnt/data/H4-Data-Modified.csv')
+df = pd.read_csv('data/H4-Data-Modified.csv')
 df['Date'] = pd.to_datetime(df['Date'])
 
 # Calculate indicators
