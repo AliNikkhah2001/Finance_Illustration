@@ -1,5 +1,4 @@
 
-```markdown
 # Animated Support/Resistance & Single Trendline (Short Segments)
 
 ## Overview
