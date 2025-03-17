@@ -1,3 +1,4 @@
+##%
 cd ~
 python3 -m venv trading_dash_env
 source trading_dash_env/bin/activate
@@ -14,4 +15,3 @@ How to Run this App:
 python app.py
     Open your browser and navigate to:
 http://127.0.0.1:8050
-
